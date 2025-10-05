@@ -9,10 +9,11 @@ import {
 
 export class CreateUserDto {
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 
   @IsNotEmpty()
-  @IsString()
+  @MinLength(6)
   password: string;
 
   @IsString()
@@ -25,6 +26,6 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  @Length(2, 200)
+  @Length(1, 100)
   about?: string;
 }

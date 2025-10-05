@@ -4,7 +4,7 @@ git branch -M main
 git push -u origin main
 
 Создать backend проект
-npx @nestjs/cli new backend
+npx @nestjs/cli new kupipodariday
 
 в общей папке.
 npx nx@latest init
@@ -21,5 +21,48 @@ git push --force https://github.com/mihailcoc/nodejs-mesto-frontend
 
 git add .
 git commit
- git push --force https://github.com/mihailcoc/KupiPodariDay
+git push --force https://github.com/mihailcoc/KupiPodariDay
 git push --set-upstream https://github.com/mihailcoc/nodejs-mesto-frontend main
+
+
+Создание модуля users
+npx @nestjs/cli g module users
+Создание сервиса users
+npx @nestjs/cli g service users --no-spec
+Создание контроллера users
+npx @nestjs/cli g controller users --no-spec
+
+Создание модуля auth
+npx @nestjs/cli g module auth
+Создание сервиса auth
+npx @nestjs/cli g service auth --no-spec
+Создание контроллера auth
+npx @nestjs/cli g controller auth --no-spec
+
+
+Создание модуля wishes
+npx @nestjs/cli g module wishes
+Создание сервиса wishes
+npx @nestjs/cli g service wishes --no-spec
+Создание контроллера wishes
+npx @nestjs/cli g controller wishes --no-spec
+
+
+Создание модуля wishlists
+npx @nestjs/cli g module wishlists
+Создание сервиса wishlists
+npx @nestjs/cli g service wishlists --no-spec
+Создание контроллера wishlists
+npx @nestjs/cli g controller wishlists --no-spec
+
+
+Создание модуля offers
+npx @nestjs/cli g module offers
+Создание сервиса offers
+npx @nestjs/cli g service offers --no-spec
+Создание контроллера offers
+npx @nestjs/cli g controller offers --no-spec
+
+users создание DTO
+npm i --save class-validator class-transformer
+
