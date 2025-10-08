@@ -8,7 +8,6 @@ import { UsersService } from '../users/UsersService';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private usersService: UsersService,
-    private configService: ConfigService,
   ) {
     super({
       /* Указываем, что токен будет передаваться в заголовке Authorization в формате Bearer <token> */

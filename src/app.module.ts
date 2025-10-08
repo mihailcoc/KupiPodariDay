@@ -12,7 +12,6 @@ import { Wishlist } from './wishlists/entities/WishlistEntity';
 import { Offer } from './offers/entities/OfferEntity';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport/dist';
-import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -22,7 +21,7 @@ import { JwtModule } from '@nestjs/jwt';
       port: 5432,
       username: 'postgres',
       password: 'postgres',
-      database: 'kupipodariday',
+      database: 'postgres',
       entities: [User, Wish, Wishlist, Offer],
       synchronize: true,
     }),
@@ -32,7 +31,6 @@ import { JwtModule } from '@nestjs/jwt';
     OffersModule,
     AuthModule,
     PassportModule,
-    JwtModule,
   ],
   controllers: [AppController],
   providers: [AppService],
