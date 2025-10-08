@@ -1,124 +1,77 @@
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
-import { FindOneOptions, Repository } from 'typeorm';
 import { User } from './entities/UserEntity';
-import { hashValue } from 'src/helpers/hash';
-import { WishesService } from 'src/wishes/wishes.service';
-import { HttpException, Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @Inject(forwardRef(() => WishesService))
-    private readonly wishesService: WishesService,
+    @InjectRepository(User)
+    private UserRepository: Repository<User>,
   ) {}
-  /*функция логина проверяем наличие пользователя наличие электронной почты и hash password*/
-  async signup(createUserDto: CreateUserDto): Promise<User> {
-    const { password, email, username } = createUserDto;
-    const existingEmail = await this.userRepository.findOne({
-      where: { email },
+  /*функция создания пользователя*/
+  async create(createUserDto: CreateUserDto) {
+    return this.UserRepository.save(createUserDto);
+  }
+  /*функция нахождения пользователей по email*/
+  async findMany(search: { query: string }) {
+    let users: User[];
+
+    users = await this.UserRepository.find({
+      where: { email: search.query },
     });
-    const existingUsername = await this.userRepository.findOne({
-      where: { username },
-    });
-    const user = await this.userRepository.create({
-      ...createUserDto,
-      password: await hashValue(password),
-    });
-    if (user && !existingEmail && !existingUsername)
-      return this.userRepository.save(user);
-    else {
-      throw new HttpException(
-        'User have already registared with such name or email',
-        409,
-      );
+
+    if (users.length < 1) {
+      users = await this.UserRepository.find({
+        where: { username: search.query },
+      });
     }
+
+    return users;
   }
 
-  async findOne(query: FindOneOptions<User>) {
-    return this.userRepository.findOneOrFail(query);
-  }
-  /*Функция нахождения пользователя по уникальному номеру используется в сервисе авторизации*/
-  async findById(id: number) {
-    return await this.userRepository.findOneBy({ id });
-  }
+  /*Функция нахождения желаний пользователя*/
+  async findWishes(username: string) {
+    const user = await this.UserRepository.findOne({
+      where: {
+        username,
+      },
+      relations: {
+        wishes: true,
+      },
+    });
 
-  /*Функция нахождения пользователя желаний пользователя*/
-  async findUserWishes(username: string) {
-    const userId = (await this.userRepository.findOne({ where: { username } }))
-      .id;
-    const userWishes = await this.wishesService.findUserId(userId);
-    return userWishes;
+    return user.wishes;
+  }
+  findOne(id: number): Promise<User> {
+    return this.UserRepository.findOneBy({ id });
   }
   /*Функция нахождения пользователя по имени пользователя*/
-  async findUserName(username: string) {
-    const user = await this.userRepository.findOne({
+  findByUsername(username: string): Promise<User> {
+    return this.UserRepository.findOne({
       where: { username },
-      select: {
-        id: true,
-        username: true,
-        about: true,
-        avatar: true,
-        createdAt: true,
-        updatedAt: true,
+      relations: {
+        wishes: true,
+        offers: true,
+        wishlists: true,
       },
     });
-    return user;
   }
   /*Функция обновления данных пользователя*/
-  async update(user: User, updateUserDto: UpdateUserDto) {
-    const userDB = await this.userRepository.findOneOrFail({
-      where: { id: user.id },
-    });
-    const { email, username, about, avatar, password } = updateUserDto;
-    /*Проверяем уникальность email*/
-    if (email && email !== userDB.email) {
-      const emailExists = await this.userRepository.findOne({
-        where: { email },
-      });
-      if (emailExists) {
-        throw new HttpException('User have already exist', 400);
-      }
-    }
-    /*Проверяем уникальность username*/
-    if (username && username !== userDB.username) {
-      const usernameExists = await this.userRepository.findOne({
-        where: { username },
-      });
-      if (usernameExists) {
-        throw new HttpException('User have already exist', 400);
-      }
-    }
-    let hashPassword;
-    if (password) {
-      hashPassword = await hashValue(password);
-    }
-    /*Обновляем поля email username about avatar hashPassword*/
-    const updatedUser = {
-      ...userDB,
-      email: email || userDB.email,
-      username: username || userDB.username,
-      about: about || userDB.about,
-      avatar: avatar || userDB.avatar,
-      password: hashPassword || userDB.password,
-    };
-    await this.userRepository.save(updatedUser);
-    const res: FindOneOptions<User> = {
-      where: { id: user.id },
-      select: {
-        email: true,
-        username: true,
-        id: true,
-        avatar: true,
-        createdAt: true,
-        updatedAt: true,
-        about: true,
-      },
-    };
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const { password, ...rest } = updateUserDto;
 
-    return this.userRepository.findOne(res);
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await this.UserRepository.update(id, {
+        password: hashedPassword,
+        ...rest,
+      });
+    } else {
+      await this.UserRepository.update(id, rest);
+    }
   }
   /*Находим пользователя по имени и адресу электронной почты*/
   async findByQuery(query: string): Promise<User[]> {
@@ -136,7 +89,11 @@ export class UsersService {
     return users;
   }
   /*Удаляем пользователя*/
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: number, userId) {
+    if (userId === id) {
+      return this.UserRepository.delete({ id });
+    } else {
+      throw new ForbiddenException();
+    }
   }
 }

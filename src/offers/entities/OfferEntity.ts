@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Contains } from 'class-validator';
 /*import { Transform } from 'class-transformer';*/
-import { Wish } from 'src/wishes/entities/wish.entity';
+import { Wish } from 'src/wishes/entities/WishEntity';
 import { User } from 'src/users/entities/UserEntity';
 
 @Entity()

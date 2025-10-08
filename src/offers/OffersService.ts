@@ -7,7 +7,7 @@ import { UpdateOfferDto } from './dto/UpdateOffer.dto';
 import { Offer } from './entities/OfferEntity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WishesService } from 'src/wishes/wishes.service';
+import { WishesService } from 'src/wishes/WishesService';
 
 @Injectable()
 export class OffersService {

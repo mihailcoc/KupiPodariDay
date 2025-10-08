@@ -1,11 +1,12 @@
 import { IsEmail, IsUrl, Length } from 'class-validator';
 import { Offer } from 'src/offers/entities/OfferEntity';
-import { Wish } from 'src/wishes/entities/wish.entity';
-import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
+import { Wish } from 'src/wishes/entities/WishEntity';
+import { Wishlist } from 'src/wishlists/entities/WishlistEntity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -42,6 +43,7 @@ export class User {
   @Column()
   password: string;
   /*Связь один ко многим один владелец ко многим желаниям*/
+  @JoinColumn()
   @OneToMany(() => Wish, (wish) => wish.owner)
   wihses: Wish[];
   /*Связь один ко многим один пользователь ко многим предложениям*/
