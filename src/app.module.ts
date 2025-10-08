@@ -10,7 +10,7 @@ import { User } from './users/entities/UserEntity';
 import { Wish } from './wishes/entities/WishEntity';
 import { Wishlist } from './wishlists/entities/WishlistEntity';
 import { Offer } from './offers/entities/OfferEntity';
-import { AuthModule } from './auth/authModule';
+import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport/dist';
 import { JwtModule } from '@nestjs/jwt';
 
