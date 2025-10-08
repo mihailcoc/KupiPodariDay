@@ -12,7 +12,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { JwtGuard } from 'src/guards/jwt.guard';
+import { JwtGuard } from 'src/guards/jwtGuard';
 
 @Controller('users')
 export class UsersController {

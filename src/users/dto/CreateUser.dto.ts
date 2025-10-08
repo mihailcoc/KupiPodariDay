@@ -5,6 +5,7 @@ import {
   IsString,
   IsUrl,
   Length,
+  MinLength,
 } from 'class-validator';
 
 export class CreateUserDto {

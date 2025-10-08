@@ -45,11 +45,11 @@ export class User {
   /*Связь один ко многим один владелец ко многим желаниям*/
   @JoinColumn()
   @OneToMany(() => Wish, (wish) => wish.owner)
-  wihses: Wish[];
+  wishes: Wish[];
   /*Связь один ко многим один пользователь ко многим предложениям*/
   @OneToMany(() => Offer, (offer) => offer.user)
   offers: Offer[];
   /*Связь один ко многим один владелец ко многим листам с желаниями*/
   @OneToMany(() => Wishlist, (wishlist) => wishlist.owner)
-  wishlist: Wishlist[];
+  userwishes: Wishlist[];
 }

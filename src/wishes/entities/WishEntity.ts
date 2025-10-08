@@ -42,7 +42,7 @@ export class Wish {
   @IsEmpty()
   raised: number;
 
-  @ManyToOne(() => User, (user) => user.wihses)
+  @ManyToOne(() => User, (user) => user.wishes)
   @JoinColumn({ name: 'user_id' })
   owner: User;
 

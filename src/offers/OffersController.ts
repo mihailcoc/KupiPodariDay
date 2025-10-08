@@ -1,6 +1,6 @@
 import { UpdateOfferDto } from './dto/UpdateOffer.dto';
 import { OffersService } from './OffersService';
-import { JwtGuard } from 'src/guards/jwt.guard';
+import { JwtGuard } from 'src/guards/jwtGuard';
 import { CreateOfferDto } from './dto/CreateOffer.dto';
 import {
   Controller,

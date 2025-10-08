@@ -1,7 +1,7 @@
 import { WishesService } from './WishesService';
 import { CreateWishDto } from './dto/CreateWish.dto';
 import { UpdateWishDto } from './dto/UpdateWish.dto';
-import { JwtGuard } from 'src/guards/jwt.guard';
+import { JwtGuard } from 'src/guards/jwtGuard';
 import {
   Controller,
   Get,

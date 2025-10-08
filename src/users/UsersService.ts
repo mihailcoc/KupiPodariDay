@@ -11,6 +11,11 @@ export class UsersService {
     @InjectRepository(User)
     private UserRepository: Repository<User>,
   ) {}
+  /*функция поиска пользователя*/
+  async findOne(id: number): Promise<User> {
+    const user = await this.UserRepository.findOneBy({ id });
+    return user;
+  }
   /*функция создания пользователя*/
   async create(createUserDto: CreateUserDto) {
     return this.UserRepository.save(createUserDto);
@@ -18,51 +23,20 @@ export class UsersService {
   /*функция нахождения пользователей по email*/
   async findMany(search: { query: string }) {
     let users: User[];
-
     users = await this.UserRepository.find({
       where: { email: search.query },
     });
-
     if (users.length < 1) {
       users = await this.UserRepository.find({
         where: { username: search.query },
       });
     }
-
     return users;
   }
 
-  /*Функция нахождения желаний пользователя*/
-  async findWishes(username: string) {
-    const user = await this.UserRepository.findOne({
-      where: {
-        username,
-      },
-      relations: {
-        wishes: true,
-      },
-    });
-
-    return user.wishes;
-  }
-  findOne(id: number): Promise<User> {
-    return this.UserRepository.findOneBy({ id });
-  }
-  /*Функция нахождения пользователя по имени пользователя*/
-  findByUsername(username: string): Promise<User> {
-    return this.UserRepository.findOne({
-      where: { username },
-      relations: {
-        wishes: true,
-        offers: true,
-        wishlists: true,
-      },
-    });
-  }
   /*Функция обновления данных пользователя*/
   async update(id: number, updateUserDto: UpdateUserDto) {
     const { password, ...rest } = updateUserDto;
-
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
       await this.UserRepository.update(id, {
@@ -75,7 +49,7 @@ export class UsersService {
   }
   /*Находим пользователя по имени и адресу электронной почты*/
   async findByQuery(query: string): Promise<User[]> {
-    const users = await this.userRepository.find({
+    const users = await this.UserRepository.find({
       where: [{ username: query }, { email: query }],
       select: {
         id: true,
@@ -95,5 +69,29 @@ export class UsersService {
     } else {
       throw new ForbiddenException();
     }
+  }
+  /*Функция нахождения желаний пользователя*/
+  async findWishes(username: string) {
+    const user = await this.UserRepository.findOne({
+      where: {
+        username,
+      },
+      relations: {
+        wishes: true,
+      },
+    });
+
+    return user.wishes;
+  }
+  /*Функция нахождения пользователя по имени пользователя*/
+  findByUsername(username: string): Promise<User> {
+    return this.UserRepository.findOne({
+      where: { username },
+      relations: {
+        wishes: true,
+        offers: true,
+        userwishes: true,
+      },
+    });
   }
 }
