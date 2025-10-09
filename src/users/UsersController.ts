@@ -62,7 +62,7 @@ export class UsersController {
     @Res({ passthrough: true }) response: Response,
     user: User,
   ) {
-    const authCookie = request.cookies.authCookie;
+    const authCookie = request[`cookies`];
 
     if (this.authService.auth(authCookie)) {
       return this.usersService.findOne(request.user.id);
