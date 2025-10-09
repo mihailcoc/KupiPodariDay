@@ -6,12 +6,9 @@ import { UsersModule } from './users/UsersModule';
 import { WishesModule } from './wishes/WishesModule';
 import { WishlistsModule } from './wishlists/WishlistsModule';
 import { OffersModule } from './offers/OffersModule';
-import { User } from './users/entities/UserEntity';
-import { Wish } from './wishes/entities/WishEntity';
-import { Wishlist } from './wishlists/entities/WishlistEntity';
-import { Offer } from './offers/entities/OfferEntity';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport/dist';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -22,7 +19,7 @@ import { PassportModule } from '@nestjs/passport/dist';
       username: 'postgres',
       password: 'postgres',
       database: 'postgres',
-      entities: [User, Wish, Wishlist, Offer],
+      entities: [__dirname + '/**/*.entity{.js, .ts}'],
       synchronize: true,
     }),
     UsersModule,
@@ -31,6 +28,7 @@ import { PassportModule } from '@nestjs/passport/dist';
     OffersModule,
     AuthModule,
     PassportModule,
+    JwtModule,
   ],
   controllers: [AppController],
   providers: [AppService],

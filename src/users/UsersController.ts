@@ -11,33 +11,66 @@ import {
   Delete,
   Req,
   UseGuards,
+  Session,
 } from '@nestjs/common';
 import { JwtGuard } from 'src/guards/jwtGuard';
-
+import { ForbiddenException, Res } from '@nestjs/common';
+import { Response } from 'express';
+import { AuthService } from 'src/auth/auth.service';
+import { Request } from 'src/types/express/index.d';
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
   /*Создаем пользователя*/
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
+  }
+  @Get(':id')
+  find(@Param('id') postId: string, @Session() session: Record<string, any>) {
+    // Сохраняем в сессии количество просмотров поста
+    if (!session.visits) {
+      session.visits = {
+        [postId]: 1,
+      };
+    } else {
+      session.visits[postId] = session.visits[postId]
+        ? session.visits[postId] + 1
+        : 1;
+    }
   }
   /*Получаем данные о пользователях*/
   @Post('find')
   findMany(@Body() query: { query: string }) {
     return this.usersService.findMany(query);
   }
-  /*Получаем данные о себе как о пользователе*/
-  @UseGuards(JwtGuard)
-  @Get('me')
-  findMe(@Req() req) {
-    return this.usersService.findOne(req.user.id);
-  }
   /*Получаем данные о своих желаниях*/
   @UseGuards(JwtGuard)
   @Get('me/wishes')
   findWishes(@Req() req) {
     return this.usersService.findWishes(req.user.username);
+  }
+  /*Получаем данные о себе как о пользователе*/
+  @UseGuards(JwtGuard)
+  @Get('me')
+  me(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
+    const authCookie = request.cookies.authCookie;
+
+    if (this.authService.auth(authCookie)) {
+      return this.usersService.findOne(request.user.id);
+    }
+
+    try {
+      const token = this.authService.auth(request.user.id);
+
+      // устанавливаем куку в ответ на запрос
+      response.cookie('authCookie', token);
+    } catch (_) {
+      throw new ForbiddenException(_);
+    }
   }
   /*Получаем данные о желаниях пользователя*/
   @UseGuards(JwtGuard)

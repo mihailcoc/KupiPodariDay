@@ -5,11 +5,11 @@ import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private UserRepository: Repository<User>,
+    @InjectRepository(User) private UserRepository: Repository<User>,
   ) {}
   /*функция поиска пользователя*/
   async findOne(id: number): Promise<User> {
