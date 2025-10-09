@@ -59,8 +59,7 @@ export class UsersController {
   @Get('me')
   me(
     @Req() request: Request,
-    @Res({ passthrough: true })
-    response: Response,
+    @Res({ passthrough: true }) response: Response,
     user: User,
   ) {
     const authCookie = request.cookies.authCookie;

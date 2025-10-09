@@ -1,5 +1,5 @@
 import * as session from 'express-session';
-import cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
@@ -10,7 +10,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableCors();
   app.use(
-    cookieParser,
+    cookieParser(),
     session({
       secret: 'my-secret',
       resave: false,

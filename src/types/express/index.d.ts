@@ -1,4 +1,5 @@
 import Request from 'express';
+import * as cookieParser from 'cookie-parser';
 
 export interface Request {
   user: {
@@ -7,6 +8,6 @@ export interface Request {
     about?: string;
     avatar?: string;
     email?: string;
-    cookies?: string;
+    cookies?: cookieParser;
   };
 }
