@@ -1,4 +1,5 @@
 import { UsersService } from './UsersService';
+import { User } from 'src/users/entities/UserEntity';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import {
@@ -56,7 +57,12 @@ export class UsersController {
   /*Получаем данные о себе как о пользователе*/
   @UseGuards(JwtGuard)
   @Get('me')
-  me(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
+  me(
+    @Req() request: Request,
+    @Res({ passthrough: true })
+    response: Response,
+    user: User,
+  ) {
     const authCookie = request.cookies.authCookie;
 
     if (this.authService.auth(authCookie)) {
@@ -64,7 +70,7 @@ export class UsersController {
     }
 
     try {
-      const token = this.authService.auth(request.user.id);
+      const token = this.authService.auth(user);
 
       // устанавливаем куку в ответ на запрос
       response.cookie('authCookie', token);

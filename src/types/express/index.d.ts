@@ -1,15 +1,12 @@
-import express from 'express';
+import Request from 'express';
 
-declare global {
-  namespace Express {
-    interface Request {
-      user: {
-        id: string;
-        username?:string;
-        about?:string;
-        avatar?:string;
-        email?:string;
-      }
-    }
-  }
+export interface Request {
+  user: {
+    id: number;
+    username?: string;
+    about?: string;
+    avatar?: string;
+    email?: string;
+    cookies?: string;
+  };
 }
