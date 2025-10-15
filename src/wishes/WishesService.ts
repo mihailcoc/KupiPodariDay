@@ -1,33 +1,68 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { UpdateWishDto } from './dto/UpdateWish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from './entities/WishEntity';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/UserEntity';
+import { UsersService } from 'src/users/UsersService';
 
 @Injectable()
 export class WishesService {
   constructor(
     @InjectRepository(Wish)
     private WishRepository: Repository<Wish>,
+    private readonly usersService: UsersService,
   ) {}
   /*Функция создания желания*/
-  create(wish, owner: User) {
+  create(wish, user: User): Promise<Wish[]> {
+    const owner = this.usersService.findById(user.id);
     const newWish = { ...wish, owner };
-
     return this.WishRepository.save(newWish);
   }
   /*Функция копирования желания*/
-  async copy(user: User, id: number) {
-    const curWish = await this.findOne(id);
 
-    await this.update(curWish.id, {
-      copied: (curWish.copied += 1),
-    });
+  async copy(id: number, user: User): Promise<Wish> {
+    const queryRunner =
+      this.WishRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const { ...wish } = curWish;
+    try {
+      const owner = await this.usersService.findById(user.id);
 
-    return this.create({ ...wish, owner: user, offers: [] }, user);
+      if (!owner) {
+        throw new Error('Пользователь не найден');
+      }
+      const wish = await this.WishRepository.findOneByOrFail({ id });
+      const existingCopy = await this.WishRepository.findOne({
+        where: { owner: { id: user.id }, name: wish.name, link: wish.link },
+      });
+
+      if (existingCopy) {
+        throw new HttpException('Вы уже копировали себе этот подарок', 409);
+      }
+      const { description, image, link, name, price } = wish;
+      const copyWish = this.WishRepository.create({
+        description,
+        image,
+        link,
+        name,
+        price,
+        owner,
+      });
+
+      wish.copied += 1;
+      await queryRunner.manager.save(wish);
+      const savedCopy = await queryRunner.manager.save(copyWish);
+
+      await queryRunner.commitTransaction();
+      return savedCopy;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
   /*Функция нахождения желаний по запросу*/
   findAll() {

@@ -2,6 +2,8 @@ import { WishesService } from './WishesService';
 import { CreateWishDto } from './dto/CreateWish.dto';
 import { UpdateWishDto } from './dto/UpdateWish.dto';
 import { JwtGuard } from 'src/guards/jwtGuard';
+import { saveUser } from 'src/common/decorators/user.decorator';
+import { User } from 'src/users/entities/UserEntity';
 import {
   Controller,
   Get,
@@ -30,18 +32,22 @@ export class WishesController {
     return this.wishesService.findTop();
   }
   /*Создание желания*/
+  /*При создании желания используется пользовательский декоратор*/
+  /*В декораторе происходит запрос и заполнение объекта SaveUser*/
+  /* у этого объекта нет поля password.*/
   @UseGuards(JwtGuard)
   @Post()
-  create(@Req() req, @Body() createWishDto: CreateWishDto) {
-    return this.wishesService.create(createWishDto, req.user);
+  create(@saveUser() user: User, @Body() createWishDto: CreateWishDto) {
+    return this.wishesService.create(createWishDto, user);
   }
   /*Копирование желания пользователя*/
   @UseGuards(JwtGuard)
   @Post(':id/copy')
-  copy(@Req() req, @Param('id') id: number) {
-    return this.wishesService.copy(req.user, id);
+  copy(@Req() req) {
+    return this.wishesService.copy(req.user, req.user.id);
   }
   /*Показ желания*/
+  @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Headers() headers, @Param('id') id: string) {
     if (headers['authorization']) {

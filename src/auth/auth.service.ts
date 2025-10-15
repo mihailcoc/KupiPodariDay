@@ -8,6 +8,8 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private userService: UsersService,
+    //private UserRepository: Repository<User>,
+    //@InjectRepository(User) private UserRepository: Repository<User>,
   ) {}
 
   auth(user: User) {
@@ -29,4 +31,8 @@ export class AuthService {
 
     return null;
   }
+  //async isAuthorized(@Req() request: Request) {
+  //  const authCookie = request[`cookies`];
+  //   return this.auth(authCookie);
+  //}
 }

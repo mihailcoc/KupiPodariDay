@@ -1,10 +1,11 @@
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { User } from './entities/UserEntity';
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { hashValue } from 'src/helpers/hash';
 
 @Injectable()
 export class UsersService {
@@ -16,24 +17,48 @@ export class UsersService {
     const user = await this.UserRepository.findOneBy({ id });
     return user;
   }
+  /*функция поиска пользователя*/
+  async findById(id: number): Promise<User> {
+    const user = await this.UserRepository.findOneBy({ id });
+    return user;
+  }
   /*функция создания пользователя*/
-  async create(createUserDto: CreateUserDto) {
-    return this.UserRepository.save(createUserDto);
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const { password, email, username } = createUserDto;
+    const existingEmail = await this.UserRepository.findOne({
+      where: { email },
+    });
+    const existingUsername = await this.UserRepository.findOne({
+      where: { username },
+    });
+    const user = await this.UserRepository.create({
+      ...createUserDto,
+      password: await hashValue(password),
+    });
+    if (user && !existingEmail && !existingUsername)
+      return this.UserRepository.save(user);
+    else {
+      throw new HttpException(
+        'Пользователь с таким email или username уже зарегистрирован',
+        409,
+      );
+    }
   }
   /*функция нахождения пользователей по email*/
-  async findMany(search: { query: string }) {
-    let users: User[];
-    users = await this.UserRepository.find({
-      where: { email: search.query },
+  async findMany(query: string): Promise<User[]> {
+    const users = await this.UserRepository.find({
+      where: [{ username: query }, { email: query }],
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        username: true,
+        about: true,
+        avatar: true,
+      },
     });
-    if (users.length < 1) {
-      users = await this.UserRepository.find({
-        where: { username: search.query },
-      });
-    }
     return users;
   }
-
   /*Функция обновления данных пользователя*/
   async update(id: number, updateUserDto: UpdateUserDto) {
     const { password, ...rest } = updateUserDto;

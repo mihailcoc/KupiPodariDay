@@ -19,6 +19,8 @@ import { ForbiddenException, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from 'src/auth/auth.service';
 import { Request } from 'src/types/express/index.d';
+import { FindUsersDto } from './dto/QueryUser.dto';
+import { UserPublicProfileResponseDto } from './dto/PublicProfileResponseUser.dto';
 @Controller('users')
 export class UsersController {
   constructor(
@@ -45,8 +47,10 @@ export class UsersController {
   }
   /*Получаем данные о пользователях*/
   @Post('find')
-  findMany(@Body() query: { query: string }) {
-    return this.usersService.findMany(query);
+  async findMany(
+    @Body() body: FindUsersDto,
+  ): Promise<UserPublicProfileResponseDto[]> {
+    return await this.usersService.findByQuery(body.query);
   }
   /*Получаем данные о своих желаниях*/
   @UseGuards(JwtGuard)
