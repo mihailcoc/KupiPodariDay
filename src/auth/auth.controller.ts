@@ -2,8 +2,7 @@ import { Controller, Post, UseGuards, Req, Body } from '@nestjs/common';
 import { UsersService } from '../users/UsersService';
 import { AuthService } from './auth.service';
 import { LocalGuard } from '../guards/localGuard';
-import { CreateUserDto } from '../users/dto/CreateUser.dto';
-import { saveUser } from 'src/common/decorators/user.decorator';
+import { CreateSaveUserDto } from '../users/dto/CreateSaveUser.dto';
 
 @Controller()
 export class AuthController {
@@ -18,11 +17,11 @@ export class AuthController {
     /* генерируем JWT-токен */
     return this.authService.auth(req.user);
   }
-  /* используем декоратор @saveUser() чтобы передать юзера без пароля */
+  /* По свагеру, при регистрации нужно вернуть обьект созданного юзера без поля password */
   @Post('signup')
-  async signup(@saveUser() @Body() createUserDto: CreateUserDto) {
+  async signup(@Body() createsaveUserDto: CreateSaveUserDto) {
     /* создаём пользователя и токен */
-    const user = await this.usersService.create(createUserDto);
+    const user = await this.usersService.createsaveuser(createsaveUserDto);
 
     return this.authService.auth(user);
   }

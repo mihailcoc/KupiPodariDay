@@ -32,6 +32,7 @@ export class UsersController {
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
+  @UseGuards(JwtGuard)
   @Get(':id')
   find(@Param('id') postId: string, @Session() session: Record<string, any>) {
     // Сохраняем в сессии количество просмотров поста
@@ -66,12 +67,9 @@ export class UsersController {
     @Res({ passthrough: true }) response: Response,
     user: User,
   ) {
-    const authCookie = request[`cookies`];
-
-    if (this.authService.auth(authCookie)) {
+    if (this.authService.auth(request[`cookies`])) {
       return this.usersService.findOne(request.user.id);
     }
-
     try {
       const token = this.authService.auth(user);
 

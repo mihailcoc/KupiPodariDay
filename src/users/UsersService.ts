@@ -1,12 +1,12 @@
 import { CreateUserDto } from './dto/CreateUser.dto';
+import { CreateSaveUserDto } from '../users/dto/CreateSaveUser.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { User } from './entities/UserEntity';
-import { Injectable, ForbiddenException, HttpException } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { hashValue } from 'src/helpers/hash';
-
 @Injectable()
 export class UsersService {
   constructor(
@@ -24,40 +24,26 @@ export class UsersService {
   }
   /*функция создания пользователя*/
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const { password, email, username } = createUserDto;
-    const existingEmail = await this.UserRepository.findOne({
-      where: { email },
-    });
-    const existingUsername = await this.UserRepository.findOne({
-      where: { username },
-    });
+    const { password } = createUserDto;
     const user = await this.UserRepository.create({
       ...createUserDto,
       password: await hashValue(password),
     });
-    if (user && !existingEmail && !existingUsername)
-      return this.UserRepository.save(user);
-    else {
-      throw new HttpException(
-        'Пользователь с таким email или username уже зарегистрирован',
-        409,
-      );
-    }
+    return this.UserRepository.save(user);
+  }
+  /*функция создания пользователя*/
+  /* По свагеру, при регистрации нужно вернуть обьект созданного юзера без поля password */
+  async createsaveuser(createsaveUserDto: CreateSaveUserDto): Promise<User> {
+    const user = await this.UserRepository.create({
+      ...createsaveUserDto,
+    });
+    return this.UserRepository.save(user);
   }
   /*функция нахождения пользователей по email*/
   async findMany(query: string): Promise<User[]> {
-    const users = await this.UserRepository.find({
-      where: [{ username: query }, { email: query }],
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        username: true,
-        about: true,
-        avatar: true,
-      },
-    });
-    return users;
+    return this.UserRepository.createQueryBuilder('user')
+      .where({ username: query }, { email: query })
+      .getMany();
   }
   /*Функция обновления данных пользователя*/
   async update(id: number, updateUserDto: UpdateUserDto) {
