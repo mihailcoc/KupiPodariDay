@@ -31,8 +31,4 @@ export class AuthService {
 
     return null;
   }
-  //async isAuthorized(@Req() request: Request) {
-  //  const authCookie = request[`cookies`];
-  //   return this.auth(authCookie);
-  //}
 }
