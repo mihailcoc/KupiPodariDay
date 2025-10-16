@@ -60,10 +60,9 @@ export class UsersService {
   }
   /*Находим пользователя по имени и адресу электронной почты*/
   async findByQuery(query: string): Promise<User[]> {
-    const users = await this.UserRepository.find({
-      where: [{ username: Like(`%${query}%`) }, { email: Like(`%${query}%`) }],
-    });
-    return users;
+    return this.UserRepository.createQueryBuilder('user')
+      .where({ username: Like(`%${query}%`) }, { email: Like(`%${query}%`) })
+      .getMany();
   }
   /*Удаляем пользователя*/
   remove(id: number, userId) {
