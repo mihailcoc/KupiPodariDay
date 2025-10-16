@@ -22,7 +22,6 @@ export class AuthController {
   async signup(@Body() createsaveUserDto: CreateSaveUserDto) {
     /* создаём пользователя и токен */
     const user = await this.usersService.createsaveuser(createsaveUserDto);
-
-    return this.authService.auth(user);
+    return user;
   }
 }

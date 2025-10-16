@@ -8,8 +8,6 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private userService: UsersService,
-    //private UserRepository: Repository<User>,
-    //@InjectRepository(User) private UserRepository: Repository<User>,
   ) {}
 
   auth(user: User) {
