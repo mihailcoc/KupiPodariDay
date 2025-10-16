@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { User } from './entities/UserEntity';
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { hashValue } from 'src/helpers/hash';
 @Injectable()
@@ -61,15 +61,7 @@ export class UsersService {
   /*Находим пользователя по имени и адресу электронной почты*/
   async findByQuery(query: string): Promise<User[]> {
     const users = await this.UserRepository.find({
-      where: [{ username: query }, { email: query }],
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        username: true,
-        about: true,
-        avatar: true,
-      },
+      where: [{ username: Like(`%${query}%`) }, { email: Like(`%${query}%`) }],
     });
     return users;
   }
