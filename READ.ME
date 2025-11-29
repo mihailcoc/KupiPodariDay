@@ -53,13 +53,6 @@ npx nx@latest init
 npm install -D @nrwl/nest
 
 
-
-git add .
-git commit
-git push --force https://github.com/mihailcoc/KupiPodariDay
-git push --set-upstream https://github.com/mihailcoc/nodejs-mesto-frontend main
-
-
 Создание модуля users
 npx @nestjs/cli g module users
 Создание сервиса users
@@ -131,3 +124,24 @@ npm install --save winston nest-winston
 npm install --save cookie-parser
 npm install --save-dev @types/cookie-parser 
 npm install passport-yandex
+
+
+
+git add .
+git commit
+git push --force https://github.com/mihailcoc/KupiPodariDay
+git push --set-upstream https://github.com/mihailcoc/KupiPodariDay main
+
+Достаем наш проект после изменений.
+git fetch https://github.com/mihailcoc/KupiPodariDay
+
+
+Docker
+Сборка образов
+docker build . -t backend-kupipodariday
+
+cd frontend
+docker build . -t frontend-kupipodariday
+
+Собираем заново.
+docker compose up --build

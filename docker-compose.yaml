@@ -1,0 +1,34 @@
+services:
+  backend:
+    container_name: backend-kupipodariday
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    image: backend-kupipodariday-compose
+    ports:
+      - '4000:3000'
+    env_file:
+      - .env
+
+  frontend:
+    container_name: frontend-kupipodariday
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    image: frontend-kupipodariday-compose
+    ports:
+      - '8080:3000'
+    env_file:
+      - .env
+
+  postgres:
+    container_name: postgres
+    image:  postgres:14-alpine
+    env_file:
+      - .env
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - '8081:8080'

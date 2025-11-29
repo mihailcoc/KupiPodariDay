@@ -14,11 +14,13 @@ import { JwtModule } from '@nestjs/jwt';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      //host: 'localhost',
+      // docker compose up --build
+      host: 'postgres',
       port: 5432,
-      username: 'student',
-      password: 'student',
-      database: 'nest_project',
+      username: 'postgres',
+      password: 'postgres',
+      database: 'postgres',
       entities: [__dirname + '/**/*.entity{.js, .ts}'],
       synchronize: true,
     }),
