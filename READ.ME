@@ -134,9 +134,12 @@ git push --set-upstream https://github.com/mihailcoc/KupiPodariDay main
 
 Достаем наш проект после изменений.
 git fetch https://github.com/mihailcoc/KupiPodariDay
+git pull https://github.com/mihailcoc/KupiPodariDay
 
 
 Docker
+sudo service docker start
+
 Сборка образов
 cd backend
 docker build . -t backend-kupipodariday
@@ -158,3 +161,7 @@ ssh -l rozamund395 158.160.183.138
 
 Учебный домен
 mike395.nomorepartiessbs.ru
+
+
+cd frontend
+ npm run deploy:docker         
