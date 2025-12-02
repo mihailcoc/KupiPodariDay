@@ -36,9 +36,11 @@ RUN npm i --production --omit=dev --no-audit --no-fund \
 # Копируем директорию со сборкой приложения
 COPY --from=builder /app/dist ./dist/
 
+# COPY ./ecosystem/config.js ./
+
 # Экспорт порта из .env
 # ENV PORT=$PORT_BACKEND
 # EXPOSE $PORT
 
 # Указываем команду для запуска приложения
-CMD ["pm2-runtime", "ecosystem.config.js"]
+ENTRYPOINT ["pm2-runtime","start", "ecosystem.config.js"]

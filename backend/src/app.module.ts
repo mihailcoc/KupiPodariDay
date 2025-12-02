@@ -9,20 +9,25 @@ import { OffersModule } from './offers/OffersModule';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport/dist';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      //host: 'localhost',
-      // docker compose up --build
-      host: 'postgres',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'postgres',
-      entities: [__dirname + '/**/*.entity{.js, .ts}'],
-      synchronize: true,
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
+    //устанавливаем соединение с базой
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configServives: ConfigService) => ({
+        type: 'postgres',
+        host: configServives.get<string>('DB_HOST'),
+        port: configServives.get<number>('DB_PORT'),
+        username: configServives.get<string>('DB_USERNAME'),
+        password: configServives.get<string>('DB_PASSWORD'),
+        database: configServives.get<string>('DB_NAME'),
+        entities: [__dirname + '/**/*.entity{.js, .ts}'], //сущности, которые описывают базу данных.
+        synchronize: true, //подгоняeт базу в СУБД к той, что описана в ORM.
+      }),
+      inject: [ConfigService],
     }),
     UsersModule,
     WishesModule,

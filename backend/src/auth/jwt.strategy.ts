@@ -1,16 +1,21 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/UsersService';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private usersService: UsersService) {
+  constructor(
+    private configService: ConfigService,
+    private userService: UsersService,
+  ) {
     super({
       /* Указываем, что токен будет передаваться в заголовке Authorization в формате Bearer <token> */
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       /* Получаем секрет для подписи JWT токенов из конфигурации */
-      secretOrKey: 'jwt_secret',
+      secretOrKey: configService.get<string>('JWT_SECRET'),
+      ignoreExpiration: false,
     });
   }
 
@@ -18,14 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * Метод validate должен вернуть данные пользователя
    * В JWT стратегии в качестве параметра метод получает полезную нагрузку из токена
    */
-  async validate(jwtPayload: { sub: number }) {
-    /* В subject токена будем передавать идентификатор пользователя */
-    const user = this.usersService.findById(jwtPayload.sub);
-
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-
-    return user;
+  async validate(payload: any) {
+    return this.userService.findById(payload.sub);
   }
 }

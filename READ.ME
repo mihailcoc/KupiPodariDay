@@ -138,6 +138,7 @@ git fetch https://github.com/mihailcoc/KupiPodariDay
 
 Docker
 Сборка образов
+cd backend
 docker build . -t backend-kupipodariday
 
 cd frontend
@@ -145,3 +146,15 @@ docker build . -t frontend-kupipodariday
 
 Собираем заново.
 docker compose up --build
+docker compose -f docker-compose.pub.yml up --build
+
+cd KupiPodariDay
+
+Опубликовать Docker  образ
+docker push mike395/backend-compose-optimized:latest
+
+docker push mike395/frontend-compose-optimized:latest
+ssh -l rozamund395 158.160.183.138
+
+Учебный домен
+mike395.nomorepartiessbs.ru

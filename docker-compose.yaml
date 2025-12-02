@@ -1,34 +1,67 @@
 services:
-  backend:
-    container_name: backend-kupipodariday
-    build:
-      context: backend
-      dockerfile: Dockerfile
-    image: backend-kupipodariday-compose
-    ports:
-      - '4000:3000'
-    env_file:
-      - .env
-
   frontend:
+    image: frontend:latest
     container_name: frontend-kupipodariday
     build:
       context: frontend
       dockerfile: Dockerfile
-    image: frontend-kupipodariday-compose
     ports:
-      - '8080:3000'
-    env_file:
-      - .env
+      - '${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}'
+    restart: unless-stopped
+    #networks:
+    #  - isolated_network
+    deploy:
+      resources:
+        limits:
+          cpus: '${FRONTEND_CPU_LIMIT:-0.5}'
+          memory: '${FRONTEND_MEM_LIMIT:-512M}'
 
-  postgres:
-    container_name: postgres
-    image:  postgres:14-alpine
-    env_file:
-      - .env
-
-  adminer:
-    image: adminer
-    restart: always
+  backend:
+    image: backend:latest
+    container_name: backend-kupipodariday
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
+      - BCRYPT_SALT_ROUNDS=${BCRYPT_SALT_ROUNDS}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - BACKEND_PORT=${BACKEND_PORT}
     ports:
-      - '8081:8080'
+      - '${BACKEND_PORT:-4000}:4000'
+    restart: unless-stopped
+    #networks:
+    #  - isolated_network
+    depends_on:
+      - db
+    deploy:
+      resources:
+        limits:
+          cpus: '${BACKEND_CPU_LIMIT:-1.0}'
+          memory: '${BACKEND_MEM_LIMIT:-1024M}'
+
+  db:
+    image: postgres:17
+    container_name: db
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - '${DB_PORT:-5432}:5432'
+    #volumes:
+    #  - pg_data:/var/lib/postgresql/data
+    #  - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    #networks:
+    #  - isolated_network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '${DB_CPU_LIMIT:-0.5}'
+          memory: '${DB_MEM_LIMIT:-512M}'

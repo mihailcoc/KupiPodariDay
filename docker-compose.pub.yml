@@ -1,0 +1,42 @@
+services:
+  backend:
+    container_name: backend
+    #build:
+    #  context: backend
+    #  dockerfile: Dockerfile.pub
+    image: mike395/backend-compose-optimized
+    ports:
+      - '${BACKEND_PORT:-4000}:3001'
+    env_file: .env
+    restart: always
+    depends_on:
+      - postgres
+
+  frontend:
+    container_name: frontend
+    #build:
+    #  context: frontend
+    #  dockerfile: Dockerfile.pub
+    image: mike395/frontend-compose-optimized
+    ports:
+      - '${FRONTEND_PORT:-9000}:80'
+    env_file: .env
+
+  postgres:
+    container_name: postgres
+    image: postgres:14-alpine
+    env_file: .env
+    restart: always
+    #volumes:
+    #  - postgres_data: /data/postgres
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - '${ADMINER_PORT:-9001}:8080'
+    depends_on:
+      - postgres
+
+#volumes:
+#  postgres_data: /data/postgres
