@@ -1,9 +1,9 @@
 services:
   backend:
     container_name: backend
-    #build:
-    #  context: backend
-    #  dockerfile: Dockerfile.pub
+    build:
+      context: backend
+      dockerfile: Dockerfile.pub
     image: mike395/backend-compose-optimized
     ports:
       - '${BACKEND_PORT:-4000}:3001'
@@ -14,9 +14,9 @@ services:
 
   frontend:
     container_name: frontend
-    #build:
-    #  context: frontend
-    #  dockerfile: Dockerfile.pub
+    build:
+      context: frontend
+      dockerfile: Dockerfile.pub
     image: mike395/frontend-compose-optimized
     ports:
       - '${FRONTEND_PORT:-9000}:80'

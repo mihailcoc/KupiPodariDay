@@ -36,7 +36,7 @@ RUN npm i --production --omit=dev --no-audit --no-fund \
 # Копируем директорию со сборкой приложения
 COPY --from=builder /app/dist ./dist/
 
-# COPY ./ecosystem/config.js ./
+COPY ./ecosystem/config.js ./
 
 # Экспорт порта из .env
 # ENV PORT=$PORT_BACKEND
